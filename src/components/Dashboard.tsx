@@ -1,10 +1,25 @@
-import { ActionIcon, AvatarGroup, Button, Divider } from '@mantine/core';
+import {
+	ActionIcon,
+	AvatarGroup,
+	Button,
+	Card,
+	Divider,
+	Popover,
+	PopoverTarget,
+	Tooltip,
+} from '@mantine/core';
 import { useGameState } from '../hooks/useGameState';
-import { IconPlayerPlayFilled } from '@tabler/icons-react';
+import {
+	IconClock,
+	IconPlayerPause,
+	IconPlayerPlayFilled,
+} from '@tabler/icons-react';
 import { GameContext } from './GameContext';
 import Track from './Track';
 import { DragDropContext } from 'react-beautiful-dnd';
 import AssigneeIcon from './AssigneeIcon';
+import Stats from './Stats';
+import { useHotkeys } from '@mantine/hooks';
 
 const reorder = (list: any, startIndex: any, endIndex: any) => {
 	const result = Array.from(list);
@@ -46,8 +61,9 @@ export const StatusMachine = {
 
 function Dashboard() {
 	const [state, update] = useGameState();
-	const { game, taskGenerator, employeeGenerator, dragId$ } =
-		GameContext.use();
+	const { game, dragId$ } = GameContext.use();
+
+	const isStarted = game.isStarted();
 
 	function onDragEnd(result: any) {
 		const { source, destination } = result;
@@ -88,50 +104,56 @@ function Dashboard() {
 		}
 	}
 
+	if (!isStarted)
+		return (
+			<Card withBorder shadow='md' className='self-center'>
+				<div className='flex flex-col gap-4 items-center'>
+					<div>Welcome to agility!</div>
+					<div>
+						Manage a team under a slew of incoming demands, will you
+						handle the stress?
+					</div>
+
+					<Button color='green' onClick={() => game.startGame()}>
+						Start new game
+					</Button>
+				</div>
+			</Card>
+		);
+
 	return (
 		<div className='flex flex-col gap-4 flex-1'>
-			<div className='flex gap-4'>
-				<div>required: {game.getThresholdScore(state.world.level)}</div>
-				<div>
-					remaining: {state.world.sprintDuration - state.world.time}
+			<div className='flex gap-4 items-center'>
+				<div className='flex text-lg font-bold justify-self-end'>
+					Goal
 				</div>
-				<div className='flex-1' />
-				<div>score: {state.world.score}</div>
+				<Stats stats={state.world.score} max={state.world.threshold} />
+				<div className='flex gap-2 items-center bg-slate-200 p-1 rounded-full text-sm'>
+					<IconClock />
+					<div className='font-bold'>
+						{state.world.sprintDuration - state.world.time}d
+					</div>
+					<div className='mr-2'>until sprint ends</div>
+				</div>
 
-				{/* pause/unpause */}
-				<ActionIcon
-					onClick={() => {
-						if (state.paused) {
-							game.start();
-						} else {
-							game.pause();
-						}
-					}}
-				>
-					<IconPlayerPlayFilled />
-				</ActionIcon>
+				<div className='flex-1' />
+
+				<div className='flex gap-1'>
+					{state.world.employees.map((e) => (
+						<AssigneeIcon assignee={e.id} key={e.id} />
+					))}
+				</div>
 			</div>
 
 			<Divider />
 
-			<div className='flex gap-4'>
-				<div>
-					<AvatarGroup>
-						{!state.world.employees.length && (
-							<Button>Recruite employees</Button>
-						)}
-						{state.world.employees.map((e) => (
-							<AssigneeIcon assignee={e.id} key={e.id} />
-						))}
-					</AvatarGroup>
-				</div>
-
+			<div className='flex gap-4 items-center'>
 				{/* generate tasks */}
 				<ActionIcon
 					color='grape'
 					onClick={() => {
 						const tasks = Array.from({ length: 3 }, (_) =>
-							taskGenerator.generate()
+							game.taskGenerator.generate()
 						);
 
 						update((state) => {
@@ -147,7 +169,7 @@ function Dashboard() {
 					color='green'
 					onClick={() => {
 						const employees = Array.from({ length: 3 }, (_) =>
-							employeeGenerator.nextEmployee()
+							game.employeeGenerator.nextEmployee()
 						);
 
 						update((state) => {
@@ -159,8 +181,6 @@ function Dashboard() {
 				</ActionIcon>
 
 				<div className='flex-1' />
-
-				<div>Managing: {state.world.project.domains.join(', ')}</div>
 			</div>
 			<Divider />
 
@@ -168,7 +188,6 @@ function Dashboard() {
 			<DragDropContext
 				onDragEnd={onDragEnd}
 				onDragStart={(drag, provided) => {
-					console.log({ drag, s: drag.source.droppableId });
 					dragId$.value = drag.source.droppableId;
 				}}
 			>

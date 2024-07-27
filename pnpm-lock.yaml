@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@mantine/core': ^7.11.2
   '@mantine/hooks': ^7.11.2
+  '@mantine/modals': ^7.11.2
   '@mantine/notifications': ^7.11.2
   '@preact/signals-react': ^2.1.0
   '@radix-ui/react-context-menu': ^2.2.1
@@ -43,6 +44,7 @@ specifiers:
 dependencies:
   '@mantine/core': 7.11.2_5kjktivz2ex4tgsbumch5agula
   '@mantine/hooks': 7.11.2_react@18.3.1
+  '@mantine/modals': 7.11.2_hg3hegkbxrzt3jvjw2himmnqui
   '@mantine/notifications': 7.11.2_hg3hegkbxrzt3jvjw2himmnqui
   '@preact/signals-react': 2.1.0_react@18.3.1
   '@radix-ui/react-context-menu': 2.2.1_ma437sazqanxqsgjws34kond6i
@@ -696,6 +698,20 @@ packages:
       react: ^18.2.0
     dependencies:
       react: 18.3.1
+    dev: false
+
+  /@mantine/modals/7.11.2_hg3hegkbxrzt3jvjw2himmnqui:
+    resolution: {integrity: sha512-AsVyGP5+F9jkQdQ9J0qzaK8q7n9bPcpswAjScpzIgEfUBC4RCvf63bmh9Yp1OEgxl1xkNdzGUYGVau0SQqHasA==}
+    peerDependencies:
+      '@mantine/core': 7.11.2
+      '@mantine/hooks': 7.11.2
+      react: ^18.2.0
+      react-dom: ^18.2.0
+    dependencies:
+      '@mantine/core': 7.11.2_5kjktivz2ex4tgsbumch5agula
+      '@mantine/hooks': 7.11.2_react@18.3.1
+      react: 18.3.1
+      react-dom: 18.3.1_react@18.3.1
     dev: false
 
   /@mantine/notifications/7.11.2_hg3hegkbxrzt3jvjw2himmnqui:

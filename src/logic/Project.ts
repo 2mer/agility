@@ -1,15 +1,10 @@
-import { Domain } from "./Domain"
-import { Resource, resourcesByDomain } from "./Resource"
+import { Resource } from "./Resource"
 
 export type Project = {
 	id: string
-	domains: Domain[]
+	domains: Resource[]
 }
 
 export function projectResources(project: Project): Resource[] {
-	let all: Resource[] = [];
-	for (const domain of project.domains) {
-		all = [...all, ...resourcesByDomain[domain]]
-	}
-	return all;
+	return project.domains;
 }

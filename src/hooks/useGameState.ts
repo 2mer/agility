@@ -5,9 +5,11 @@ import { Task } from "../logic/Task"
 import { Project } from "../logic/Project"
 import { Employee } from "../logic/Employee"
 import { v4 } from "uuid"
+import { createStats, Stats } from "@/logic/Stats"
 
 export type World = {
-	score: number,
+	score: Stats,
+	threshold: Stats,
 	time: number,
 	sprintDuration: number,
 	level: number,
@@ -38,10 +40,11 @@ const defaultState: GameState = {
 		employees: [],
 		level: 0,
 		project: {
-			domains: ['ui'],
+			domains: ['Engineering'],
 			id: v4(),
 		},
-		score: 0,
+		score: createStats(),
+		threshold: createStats(),
 		time: 0,
 		sprintDuration: 0,
 		lanes: {

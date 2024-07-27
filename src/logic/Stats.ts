@@ -23,8 +23,14 @@ export function statsResources(stats: Stats): Resource[] {
 	return all;
 }
 
-export function add(a: Stats, b: Stats) {
-	return mapValues(a, (v, key) => v + b[key]);
+export function add(a: Stats, b: Stats, mask?: Resource[]) {
+	return mapValues(a, (v, key) => {
+		const sum = v + b[key];
+		if (!mask) return sum;
+		if (mask && mask.includes(key)) return sum;
+
+		return v;
+	});
 }
 
 export function sub(a: Stats, b: Stats) {
@@ -33,6 +39,10 @@ export function sub(a: Stats, b: Stats) {
 
 export function clamp0(a: Stats) {
 	return mapValues(a, (v) => Math.max(0, v));
+}
+
+export function allGt0(a: Stats) {
+	return Object.values(a).every(v => v >= 0);
 }
 
 export function statsZeroed(a: Stats) {

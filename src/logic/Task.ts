@@ -4,7 +4,7 @@ export type Task = {
 	id: string;
 	name: string;
 	requirements: Stats;
-	score: number;
+	progress: Stats;
 	assignee?: string; // Employee id
 };
 

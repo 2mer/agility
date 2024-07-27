@@ -1,19 +1,50 @@
+import { Resource, ResourceDisplay } from '@/logic/Resource';
 import { Stats as IStats } from '../logic/Stats';
+import { Tooltip } from '@mantine/core';
 
-function Stats({ stats }: { stats: IStats }) {
+export function Stat({
+	value,
+	resource,
+	max,
+}: {
+	value: number;
+	max?: number;
+	resource: Resource;
+}) {
+	const { Icon, color } = ResourceDisplay[resource];
+
+	return (
+		<Tooltip label={resource}>
+			<div
+				className='flex items-center gap-1 p-1 rounded-md text-xs'
+				style={{
+					color,
+					border: `1px solid currentColor`,
+				}}
+			>
+				<Icon className='w-4 h-4' />
+				<div className='font-mono'>
+					{value}
+					{max && `/${max}`}
+				</div>
+			</div>
+		</Tooltip>
+	);
+}
+
+function Stats({ stats, max }: { stats: IStats; max?: IStats }) {
 	return (
 		<div className='flex gap-2 flex-wrap'>
 			{Object.entries(stats)
-				.filter(([, v]) => Boolean(v))
+				.filter(([k, v]) => Boolean(v) || Boolean(max?.[k as Resource]))
 				.map(([k, v]) => {
 					return (
-						<div
+						<Stat
+							value={v}
+							resource={k as Resource}
 							key={k}
-							className='flex gap-2 bg-slate-200 p-1 rounded-md text-xs'
-						>
-							<div>{k}</div>
-							<div>{v}</div>
-						</div>
+							max={max?.[k as Resource]}
+						/>
 					);
 				})}
 		</div>

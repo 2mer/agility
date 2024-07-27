@@ -3,7 +3,7 @@ import { Card } from '@mantine/core';
 import { Task as ITask } from '../logic/Task';
 import Stats from './Stats';
 import AssigneeIcon from './AssigneeIcon';
-import AssignMenu from './AssignMenu';
+import TaskContextMenu from './TaskContextMenu';
 import { useSignal } from '@preact/signals-react';
 import { useGameState } from '@/hooks/useGameState';
 
@@ -48,37 +48,28 @@ function Task({
 					{...provided.dragHandleProps}
 					className='p-1'
 				>
-					<AssignMenu
-						onSelect={(e) =>
-							update((state) => {
-								const t = state.world.lanes[laneId].find(
-									(t) => t.id === task.id
-								);
-								if (!t) return;
-
-								t.assignee = e.id;
-							})
-						}
-					>
+					<TaskContextMenu laneId={laneId} task={task}>
 						<Card
 							withBorder
 							shadow={snapshot.isDragging ? 'md' : undefined}
 						>
 							<div className='flex flex-col items-start gap-4'>
-								<div className='text-start'>
-									{task.name} - {task.score}
-								</div>
+								<div className='text-start'>{task.name}</div>
 								<div className='flex gap-2 self-stretch items-end'>
-									<Stats stats={task.requirements} />
+									<Stats
+										stats={task.progress}
+										max={task.requirements}
+									/>
 									<div className='ml-auto'>
 										<AssigneeIcon
 											assignee={task.assignee}
+											size='sm'
 										/>
 									</div>
 								</div>
 							</div>
 						</Card>
-					</AssignMenu>
+					</TaskContextMenu>
 				</div>
 			)}
 		</Draggable>
