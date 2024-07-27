@@ -26,6 +26,19 @@ function App() {
 										Agility
 									</div>
 									<div className='flex-1' />
+									<div className='flex gap-2 text-slate-400 items-center'>
+										<div className='text-sm'>
+											Made by{' '}
+											<span className='font-bold'>
+												Tomer Atar
+											</span>{' '}
+											and{' '}
+											<span className='font-bold'>
+												Roy Varon
+											</span>
+										</div>
+									</div>
+									<div className='flex-1' />
 									<PauseButton />
 								</div>
 							</AppShell.Header>
