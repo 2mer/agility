@@ -36,7 +36,7 @@ function Track({ items, id }: { items: ITask[]; id: string }) {
 
 	return (
 		<Droppable key={id} droppableId={id} isDropDisabled={!enabled}>
-			{(provided, snapshot) => (
+			{(provided, _) => (
 				<div
 					className='flex flex-col gap-4 flex-1'
 					{...(id === 'todo' && {

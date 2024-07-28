@@ -222,7 +222,7 @@ function Dashboard() {
 			{/* tracks */}
 			<DragDropContext
 				onDragEnd={onDragEnd}
-				onDragStart={(drag, provided) => {
+				onDragStart={(drag, _) => {
 					dragId$.value = drag.source.droppableId;
 				}}
 			>

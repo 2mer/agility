@@ -73,7 +73,9 @@ const EmployeeAvatar = ({
 					radius='xl'
 					onMouseEnter={open}
 					onMouseLeave={close}
-					style={{ border: '2px solid ' + theme.colors[color][5] }}
+					style={{
+						border: '2px solid ' + theme.colors[color as any][5],
+					}}
 					{...rest}
 				>
 					{a.name

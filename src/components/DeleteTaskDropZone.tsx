@@ -10,7 +10,7 @@ function DeleteTask() {
 
 	const id = 'delete';
 
-	const { dragId$, game } = GameContext.use();
+	const { dragId$ } = GameContext.use();
 
 	const fromId = dragId$.value;
 
@@ -23,7 +23,7 @@ function DeleteTask() {
 	return (
 		<div className='bottom-10 flex justify-center w-full pointer-events-none'>
 			<Droppable droppableId={id} isDropDisabled={!enabled}>
-				{(provided, snapshot) => (
+				{(provided, _) => (
 					<div
 						ref={provided.innerRef}
 						{...provided.droppableProps}

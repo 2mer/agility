@@ -35,7 +35,7 @@ export type Resource = (typeof resources)[number];
 // 	security: ['Security'],
 // };
 
-export const ResourceDisplay: { [key in Resource]: { Icon: ComponentType, color: string } } = {
+export const ResourceDisplay: { [key in Resource]: { Icon: ComponentType<{ className?: string }>, color: string } } = {
 	Cloud: {
 		Icon: IconCloud,
 		color: '#edcf26',
