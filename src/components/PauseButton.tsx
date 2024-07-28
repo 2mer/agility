@@ -8,13 +8,17 @@ function PauseButton() {
 
 	useHotkeys([['Space', () => game.togglePauseState()]]);
 
+	const isPaused = game.isPaused();
+
 	return (
 		<ActionIcon
 			onClick={() => {
 				game.togglePauseState();
 			}}
+			color={isPaused ? 'orange' : 'blue'}
+			data-tour-step='pause'
 		>
-			{game.isPaused() ? <IconPlayerPause /> : <IconPlayerPlayFilled />}
+			{isPaused ? <IconPlayerPause /> : <IconPlayerPlayFilled />}
 		</ActionIcon>
 	);
 }

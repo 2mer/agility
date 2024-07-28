@@ -33,8 +33,14 @@ export function add(a: Stats, b: Stats, mask?: Resource[]) {
 	});
 }
 
-export function sub(a: Stats, b: Stats) {
-	return mapValues(a, (v, key) => v + b[key]);
+export function sub(a: Stats, b: Stats, mask?: Resource[]) {
+	return mapValues(a, (v, key) => {
+		const rem = v - b[key];
+		if (!mask) return rem;
+		if (mask && mask.includes(key)) return rem;
+
+		return v;
+	});
 }
 
 export function clamp0(a: Stats) {

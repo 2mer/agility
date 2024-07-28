@@ -38,37 +38,37 @@ export type Resource = (typeof resources)[number];
 export const ResourceDisplay: { [key in Resource]: { Icon: ComponentType, color: string } } = {
 	Cloud: {
 		Icon: IconCloud,
-		color: 'blue',
+		color: '#edcf26',
 	},
 
 	Security: {
 		Icon: IconShieldHalfFilled,
-		color: 'blue',
+		color: '#4287f5',
 	},
 
 	Data: {
 		Icon: IconChartPie3,
-		color: 'purple',
+		color: '#953af0',
 	},
 
 	Design: {
 		Icon: IconPalette,
-		color: 'magenta'
+		color: '#eb31bc'
 	},
 
 	Engineering: {
 		Icon: IconTool,
-		color: 'orange',
+		color: '#eb9731',
 	},
 
 	Marketing: {
 		Icon: IconCurrencyDollar,
-		color: 'green',
+		color: '#2adb44',
 	},
 
 	Testing: {
 		Icon: IconFlask,
-		color: 'cyan'
+		color: '#29d6cb'
 	},
 
 

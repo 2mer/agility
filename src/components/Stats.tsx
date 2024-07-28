@@ -19,11 +19,11 @@ export function Stat({
 				className='flex items-center gap-1 p-1 rounded-md text-xs'
 				style={{
 					color,
-					border: `1px solid currentColor`,
+					border: `2px solid currentColor`,
 				}}
 			>
 				<Icon className='w-4 h-4' />
-				<div className='font-mono'>
+				<div className='font-mono font-bold'>
 					{value}
 					{max && `/${max}`}
 				</div>

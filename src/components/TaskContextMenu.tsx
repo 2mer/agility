@@ -1,12 +1,15 @@
 import { useGameState } from '../hooks/useGameState';
 import { PropsWithChildren } from 'react';
-import AssigneeIcon from './AssigneeIcon';
+import EmployeeAvatar from './EmployeeAvatar';
 import { useSignals } from '@preact/signals-react/runtime';
 import {
 	ContextMenu,
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuSeparator,
+	ContextMenuSub,
+	ContextMenuSubContent,
+	ContextMenuSubTrigger,
 	ContextMenuTrigger,
 } from './ui/context-menu';
 import {
@@ -22,10 +25,12 @@ import { Task } from '@/logic/Task';
 import {
 	IconArrowDown,
 	IconArrowUp,
+	IconTrash,
 	IconUserPlus,
 	IconUserX,
 } from '@tabler/icons-react';
 import { modals } from '@mantine/modals';
+import { sounds } from '@/logic/sounds';
 
 function TaskContextMenu({
 	children,
@@ -34,7 +39,7 @@ function TaskContextMenu({
 }: PropsWithChildren<{ laneId: string; task: Task }>) {
 	useSignals();
 
-	const [state] = useGameState();
+	const [state, update] = useGameState();
 	// const [open, setOpen] = useState(false);
 
 	const foundAssignee = state.world.employees.find(
@@ -49,7 +54,7 @@ function TaskContextMenu({
 				{foundAssignee && (
 					<>
 						<div className='flex gap-4 items-center p-2'>
-							<AssigneeIcon assignee={foundAssignee.id} />
+							<EmployeeAvatar assignee={foundAssignee.id} />
 
 							<div className='flex flex-col'>
 								<div className='text-xs text-slate-400'>
@@ -65,39 +70,88 @@ function TaskContextMenu({
 					</>
 				)}
 
-				<ContextMenuItem
-					className='gap-1'
-					onClick={() => {
-						modals.open({
-							title: 'Assign',
-							children: (
-								<Assign
-									laneId={laneId}
-									task={task}
-									close={() => modals.closeAll()}
-								/>
-							),
-						});
-					}}
-				>
-					<IconUserPlus />
-					Assign
-				</ContextMenuItem>
-				<ContextMenuItem className='gap-1'>
-					<IconUserX color='red' />
-					Unassign
-				</ContextMenuItem>
+				<ContextMenuSub>
+					<ContextMenuSubTrigger>Assignee</ContextMenuSubTrigger>
+
+					<ContextMenuSubContent className='w-48'>
+						<ContextMenuItem
+							className='gap-1'
+							onClick={() => {
+								modals.open({
+									title: 'Assign',
+									children: (
+										<Assign
+											laneId={laneId}
+											task={task}
+											close={() => modals.closeAll()}
+										/>
+									),
+								});
+							}}
+						>
+							<IconUserPlus />
+							Assign
+						</ContextMenuItem>
+						<ContextMenuItem
+							className='gap-1'
+							onClick={() => {
+								update((state) => {
+									const t = state.world.lanes[laneId].find(
+										(t) => t.id === task.id
+									);
+									if (!t) return;
+
+									t.assignee = undefined;
+								});
+							}}
+						>
+							<IconUserX color='red' />
+							Unassign
+						</ContextMenuItem>
+					</ContextMenuSubContent>
+				</ContextMenuSub>
 
 				<ContextMenuSeparator />
 
-				<ContextMenuItem className='gap-1'>
-					<IconArrowUp />
-					Move to the top of the lane
-				</ContextMenuItem>
-				<ContextMenuItem className='gap-1'>
-					<IconArrowDown />
-					Move to the bottom of the lane
-				</ContextMenuItem>
+				<ContextMenuSub>
+					<ContextMenuSubTrigger>Move to</ContextMenuSubTrigger>
+
+					<ContextMenuSubContent className='w-48'>
+						<ContextMenuItem className='gap-1'>
+							<IconArrowUp />
+							top of lane
+						</ContextMenuItem>
+						<ContextMenuItem className='gap-1'>
+							<IconArrowDown />
+							bottom of lane
+						</ContextMenuItem>
+					</ContextMenuSubContent>
+				</ContextMenuSub>
+
+				{laneId !== 'done' && (
+					<>
+						<ContextMenuSeparator />
+						<ContextMenuItem
+							className='gap-1'
+							onClick={() => {
+								update((state) => {
+									const i = state.world.lanes[
+										laneId
+									].findIndex((t) => t.id === task.id);
+
+									if (i > -1) {
+										state.world.lanes[laneId].splice(i, 1);
+									}
+								});
+
+								sounds.damage.play();
+							}}
+						>
+							<IconTrash color='red' />
+							Delete
+						</ContextMenuItem>
+					</>
+				)}
 			</ContextMenuContent>
 		</ContextMenu>
 	);
@@ -141,7 +195,7 @@ const Assign = ({
 							disabled={false}
 							className='gap-2'
 						>
-							<AssigneeIcon assignee={e.id} size='sm' />
+							<EmployeeAvatar assignee={e.id} size='sm' />
 							{e.name}
 						</CommandItem>
 					))}

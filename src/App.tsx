@@ -8,6 +8,9 @@ import { useHashLocation } from 'wouter/use-hash-location';
 import { IconBolt } from '@tabler/icons-react';
 import PauseButton from './components/PauseButton';
 import { ModalsProvider } from '@mantine/modals';
+import HealthBar from './components/HealthBar';
+import { PropsWithChildren } from 'react';
+import KillRunButton from './components/KillRunButton';
 
 function App() {
 	return (
@@ -39,18 +42,26 @@ function App() {
 										</div>
 									</div>
 									<div className='flex-1' />
-									<PauseButton />
+									<Actions>
+										<div className='flex p-4'>
+											<HealthBar />
+										</div>
+										<PauseButton />
+										<KillRunButton />
+									</Actions>
 								</div>
 							</AppShell.Header>
-
+							{/* 
 							<AppShell.Main
 								style={{
 									display: 'flex',
 									flexDirection: 'column',
+									width: '100vw',
+									height: '100vh',
 								}}
 							>
-								<Dashboard />
-							</AppShell.Main>
+							</AppShell.Main> */}
+							<Dashboard />
 						</AppShell>
 					</ModalsProvider>
 				</Router>
@@ -58,5 +69,13 @@ function App() {
 		</MantineProvider>
 	);
 }
+
+const Actions = ({ children }: PropsWithChildren<{}>) => {
+	const { game } = GameContext.use();
+	const available = !game.isDead() && game.isStarted();
+	if (!available) return null;
+
+	return <>{children}</>;
+};
 
 export default App;

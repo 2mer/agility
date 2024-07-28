@@ -8,6 +8,10 @@ import { v4 } from "uuid"
 import { createStats, Stats } from "@/logic/Stats"
 
 export type World = {
+	name: string,
+	health: number,
+	maxHealth: number,
+	rerollCooldown: number,
 	score: Stats,
 	threshold: Stats,
 	time: number,
@@ -16,6 +20,8 @@ export type World = {
 	lanes: { [key: string]: Task[] },
 	project: Project,
 	employees: Employee[],
+	storeEmployees: Employee[],
+	maxEmployees: number,
 }
 
 export type GameState = {
@@ -24,6 +30,7 @@ export type GameState = {
 	world: World,
 
 	paused: boolean,
+	onboarding: boolean,
 
 	preferences: {
 	},
@@ -36,8 +43,15 @@ const defaultState: GameState = {
 	version: GAME_VERSION,
 	preferences: {},
 	paused: false,
+	onboarding: true,
 	world: {
+		name: 'Dev',
+		health: 3,
+		maxHealth: 3,
+		rerollCooldown: 0,
 		employees: [],
+		storeEmployees: [],
+		maxEmployees: 1,
 		level: 0,
 		project: {
 			domains: ['Engineering'],

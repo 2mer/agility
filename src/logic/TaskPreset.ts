@@ -30,7 +30,7 @@ export function chooseTaskPresetsByResources(
 
 	return presets.filter(preset => {
 		const res = statsResources(preset.requirements);
-		return resources.every(r => res.includes(r));
+		return res.every(r => resources.includes(r));
 	})
 }
 
@@ -167,8 +167,72 @@ export const allTaskPresets: TaskPreset[] = [
 		}),
 	},
 	{
+		name: 'Something doesnt work',
+		requirements: createStats({
+			Engineering: 5,
+		}),
+	},
+	{
+		name: 'Demo Rejects',
+		requirements: createStats({
+			Engineering: 1,
+		}),
+	},
+	{
+		name: 'Error handling',
+		requirements: createStats({
+			Engineering: 3,
+		}),
+	},
+	{
+		name: 'User authentication',
+		requirements: createStats({
+			Engineering: 3,
+		}),
+	},
+	{
+		name: 'Database connection',
+		requirements: createStats({
+			Engineering: 3,
+		}),
+	},
+	{
+		name: 'Database connection',
+		requirements: createStats({
+			Engineering: 3,
+		}),
+	},
+	{
 		name: 'Implement security features',
 		requirements: createStats({ Security: 5 }),
+	},
+	{
+		name: 'Demo UI',
+		requirements: createStats({ Design: 2 }),
+	},
+	{
+		name: 'Prototyping',
+		requirements: createStats({ Design: 3 }),
+	},
+	{
+		name: 'Custom Theme',
+		requirements: createStats({ Design: 3 }),
+	},
+	{
+		name: 'Look & Feel',
+		requirements: createStats({ Design: 4 }),
+	},
+	{
+		name: 'Create wireframe',
+		requirements: createStats({ Design: 2 }),
+	},
+	{
+		name: 'Components Library',
+		requirements: createStats({ Design: 3, Engineering: 4 }),
+	},
+	{
+		name: 'Pixel perfect nit-picks',
+		requirements: createStats({ Design: 1 }),
 	},
 	{
 		name: 'Perform QA testing',
@@ -181,9 +245,66 @@ export const allTaskPresets: TaskPreset[] = [
 		}),
 	},
 	{
+		name: 'Investor Demo',
+		requirements: createStats({
+			Marketing: 5,
+			Design: 1,
+			Engineering: 1,
+		}),
+	},
+	{
+		name: 'Sales Pitch',
+		requirements: createStats({
+			Marketing: 5,
+		}),
+	},
+	{
 		name: 'Rework the whole project',
 		requirements: createStats({
-			Engineering: 15,
+			Engineering: 2,
+		}),
+	},
+	{
+		name: 'Cloud infra',
+		requirements: createStats({
+			Cloud: 2,
+		}),
+	},
+	{
+		name: 'Protect secret keys',
+		requirements: createStats({
+			Cloud: 2,
+			Security: 2,
+		}),
+	},
+	{
+		name: 'Move existing code to cloud',
+		requirements: createStats({
+			Cloud: 5,
+			Engineering: 5,
+		}),
+	},
+	{
+		name: 'Trend analysis',
+		requirements: createStats({
+			Data: 2,
+		}),
+	},
+	{
+		name: 'Pen-test rejects',
+		requirements: createStats({
+			Security: 2,
+		}),
+	},
+	{
+		name: 'Something went horribly wrong',
+		requirements: createStats({
+			Testing: 2,
+			Engineering: 2,
+			Marketing: 2,
+			Security: 2,
+			Design: 2,
+			Cloud: 2,
 		}),
 	},
 ]

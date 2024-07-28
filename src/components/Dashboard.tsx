@@ -1,25 +1,51 @@
-import {
-	ActionIcon,
-	AvatarGroup,
-	Button,
-	Card,
-	Divider,
-	Popover,
-	PopoverTarget,
-	Tooltip,
-} from '@mantine/core';
+import { Avatar } from '@mantine/core';
 import { useGameState } from '../hooks/useGameState';
-import {
-	IconClock,
-	IconPlayerPause,
-	IconPlayerPlayFilled,
-} from '@tabler/icons-react';
+import { IconClock, IconSettings } from '@tabler/icons-react';
 import { GameContext } from './GameContext';
 import Track from './Track';
 import { DragDropContext } from 'react-beautiful-dnd';
-import AssigneeIcon from './AssigneeIcon';
+import EmployeeAvatar from './EmployeeAvatar';
 import Stats from './Stats';
-import { useHotkeys } from '@mantine/hooks';
+import { PlusIcon } from 'lucide-react';
+import { modals } from '@mantine/modals';
+import StoreModal from './StoreModal';
+import NewGameScreen from './NewGameScreen';
+import GameLostScreen from './GameLostScreen';
+import Tour from 'reactour';
+import { sounds } from '@/logic/sounds';
+
+const tourSteps: { content: string; selector: string }[] = [
+	{
+		content:
+			'Welcome to your board! Dont worry the game is paused! you can pause/unpause at any moment by clicking this toggle button or via pressing the spacebar',
+		selector: '[data-tour-step="pause"]',
+	},
+	{
+		content:
+			'The game is split to sprints, each sprint has a resource goal',
+		selector: '[data-tour-step="sprint-goal"]',
+	},
+	{
+		content:
+			'You amass resources by completing tasks, each task requires effort to be made in its specialization domains',
+		selector: '[data-tour-step="task-resources"]',
+	},
+	{
+		content:
+			'Assign workers to tasks (via right clicking a task) in order to complete them, users have speciality in different fields, the speciality indicates how much effort is added to the task at the end of a sprint day',
+		selector: '[data-tour-step="employees"]',
+	},
+	{
+		content:
+			'Employees automatically pull assigned tasks from the backlog as long as they are assigned to them',
+		selector: '[data-tour-step="employees-todo"]',
+	},
+	{
+		content:
+			'When the sprint ends without enough resources, you stay on the same sprint, and your health is deducted by one point - the game ends at 0 health points. Good luck!',
+		selector: '[data-tour-step="health"]',
+	},
+];
 
 const reorder = (list: any, startIndex: any, endIndex: any) => {
 	const result = Array.from(list);
@@ -54,9 +80,9 @@ const move = (
 };
 
 export const StatusMachine = {
-	todo: ['inProgress'],
-	inProgress: ['todo'],
-	onHold: ['todo'],
+	todo: ['inProgress', 'delete'],
+	inProgress: ['todo', 'delete'],
+	onHold: ['todo', 'delete'],
 };
 
 function Dashboard() {
@@ -68,14 +94,21 @@ function Dashboard() {
 	function onDragEnd(result: any) {
 		const { source, destination } = result;
 
-		dragId$.value = undefined;
-
 		// dropped outside the list
 		if (!destination) {
+			dragId$.value = undefined;
 			return;
 		}
 		const sInd = source.droppableId;
 		const dInd = destination.droppableId;
+
+		if (dInd === 'delete') {
+			update((state) => {
+				state.world.lanes[sInd].splice(source.index, 1);
+			});
+			sounds.damage.play();
+			return;
+		}
 
 		if (sInd === dInd) {
 			const items = reorder(
@@ -102,87 +135,89 @@ function Dashboard() {
 				state.world.lanes[dInd] = result[dInd] as any[];
 			});
 		}
+		dragId$.value = undefined;
 	}
 
-	if (!isStarted)
-		return (
-			<Card withBorder shadow='md' className='self-center'>
-				<div className='flex flex-col gap-4 items-center'>
-					<div>Welcome to agility!</div>
-					<div>
-						Manage a team under a slew of incoming demands, will you
-						handle the stress?
-					</div>
+	if (!isStarted) return <NewGameScreen />;
+	if (game.isDead()) return <GameLostScreen />;
 
-					<Button color='green' onClick={() => game.startGame()}>
-						Start new game
-					</Button>
-				</div>
-			</Card>
-		);
+	const employeeRem = state.world.maxEmployees - state.world.employees.length;
 
 	return (
-		<div className='flex flex-col gap-4 flex-1'>
+		<div className='flex flex-col gap-4 flex-1 w-full h-full pt-10 pb-10'>
+			<Tour
+				steps={tourSteps}
+				isOpen={state.onboarding}
+				onRequestClose={() => {
+					update((state) => {
+						state.onboarding = false;
+					});
+				}}
+			/>
 			<div className='flex gap-4 items-center'>
-				<div className='flex text-lg font-bold justify-self-end'>
-					Goal
-				</div>
-				<Stats stats={state.world.score} max={state.world.threshold} />
-				<div className='flex gap-2 items-center bg-slate-200 p-1 rounded-full text-sm'>
-					<IconClock />
-					<div className='font-bold'>
-						{state.world.sprintDuration - state.world.time}d
+				<div
+					className='flex gap-4 items-center'
+					data-tour-step='sprint-goal'
+				>
+					<div className='flex text-lg font-bold justify-self-end'>
+						Sprint {state.world.level}
 					</div>
-					<div className='mr-2'>until sprint ends</div>
+					<Stats
+						stats={state.world.score}
+						max={state.world.threshold}
+					/>
+					<div className='flex gap-2 items-center bg-slate-200 p-1 rounded-full text-sm'>
+						<IconClock />
+						<div className='font-bold'>
+							{state.world.sprintDuration - state.world.time}d
+						</div>
+						<div className='mr-2'>until sprint ends</div>
+					</div>
 				</div>
 
 				<div className='flex-1' />
 
-				<div className='flex gap-1'>
+				<div className='flex gap-1' data-tour-step='employees'>
+					{Array.from({
+						length: Math.max(0, employeeRem),
+					}).map((_, i) => (
+						<Avatar
+							key={i}
+							color='gray'
+							className='cursor-pointer'
+							onClick={() => {
+								modals.open({
+									children: <StoreModal />,
+									fullScreen: true,
+								});
+							}}
+						>
+							<PlusIcon />
+						</Avatar>
+					))}
+
+					{employeeRem <= 0 && (
+						<Avatar
+							color='gray'
+							className='cursor-pointer'
+							onClick={() => {
+								modals.open({
+									children: <StoreModal />,
+									fullScreen: true,
+								});
+							}}
+						>
+							<IconSettings />
+						</Avatar>
+					)}
 					{state.world.employees.map((e) => (
-						<AssigneeIcon assignee={e.id} key={e.id} />
+						<EmployeeAvatar assignee={e.id} key={e.id} />
 					))}
 				</div>
 			</div>
 
-			<Divider />
-
-			<div className='flex gap-4 items-center'>
-				{/* generate tasks */}
-				<ActionIcon
-					color='grape'
-					onClick={() => {
-						const tasks = Array.from({ length: 3 }, (_) =>
-							game.taskGenerator.generate()
-						);
-
-						update((state) => {
-							state.world.lanes.todo.push(...tasks);
-						});
-					}}
-				>
-					<IconPlayerPlayFilled />
-				</ActionIcon>
-
-				{/* generate employees */}
-				<ActionIcon
-					color='green'
-					onClick={() => {
-						const employees = Array.from({ length: 3 }, (_) =>
-							game.employeeGenerator.nextEmployee()
-						);
-
-						update((state) => {
-							state.world.employees.push(...employees);
-						});
-					}}
-				>
-					<IconPlayerPlayFilled />
-				</ActionIcon>
-
-				<div className='flex-1' />
-			</div>
-			<Divider />
+			{/* <Divider /> */}
+			<div />
 
 			{/* tracks */}
 			<DragDropContext
